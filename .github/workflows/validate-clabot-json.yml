@@ -1,0 +1,11 @@
+name: Validate cla-bot config file
+on: [push, pull_request]
+jobs:
+  Check-Config-Is-Valid-JSON:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: List files in the repository
+        run: |
+          jq < ${{ github.workspace }}/.clabot
