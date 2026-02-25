@@ -48,7 +48,8 @@
     "cedricbahirwe",
     "wjdtjq6",
     "tifroz",
-    "colemancda"
+    "colemancda",
+    "asserusama"
   ],
   "message": "Thank you for your pull request and welcome to the Skip community. We require contributors to sign our [contributor license agreement (CLA)](https://github.com/skiptools/clabot-config/blob/main/Contributor-License-Agreement.md), and we don't seem to have the user(s) {{usersWithoutCLA}} on file. In order for us to review and merge your code, for each noted user ***please add your GitHub username to Skip's [.clabot](https://github.com/skiptools/clabot-config/edit/main/.clabot) file***",
   "recheckComment": "recheck"
