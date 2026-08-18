@@ -1,0 +1,49 @@
+name: CLA
+
+# cla-bot is installed organisation-wide and offers no per-repository opt-out,
+# so it complains on every pull request opened here -- signing the CLA is what
+# this repository is for. This workflow clears that complaint, and merges a pull
+# request whose only change is adding its own author to the .clabot file.
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review]
+  status:
+  workflow_dispatch:
+    inputs:
+      pull_request:
+        description: Pull request number to re-process
+        required: true
+        type: string
+
+permissions:
+  contents: write # merge the pull request
+  issues: write # remove the cla-bot comment
+  pull-requests: write # approve the pull request
+  statuses: write # override the verification/cla-signed status
+
+concurrency:
+  group: cla-${{ github.event.pull_request.number || inputs.pull_request || github.event.sha }}
+
+jobs:
+  Self-Signup:
+    # `status` fires for every commit status, including the ones set below
+    if: >-
+      github.event_name != 'status' ||
+      (github.event.context == 'verification/cla-signed' && github.event.state != 'success')
+    runs-on: ubuntu-latest
+    steps:
+      # `pull_request_target` checks out the base branch, never the pull
+      # request's own code, which is only ever read as JSON and never executed
+      - name: Check out repository code
+        uses: actions/checkout@v6
+      - name: Handle CLA pull requests
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          DISPATCH_PR: ${{ inputs.pull_request }}
+          STATUS_SHA: ${{ github.event.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: .github/scripts/handle-cla-pull-requests.sh
