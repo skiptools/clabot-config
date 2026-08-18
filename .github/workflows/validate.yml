@@ -1,17 +1,26 @@
-name: CLA
+name: Validate
 
+# Every check this repository performs.
+#
+# On a push the .clabot file is checked for well-formedness. On a pull request
+# the proposed .clabot file is additionally required to add exactly one
+# username -- the pull request author's own -- directly above the marker at the
+# end of the list, and a pull request that does exactly that is merged
+# automatically.
+#
 # cla-bot is installed organisation-wide and offers no per-repository opt-out,
-# so it complains on every pull request opened here -- signing the CLA is what
-# this repository is for. This workflow clears that complaint, and merges a pull
-# request whose only change is adding its own author to the .clabot file.
+# so it complains on every pull request opened here even though signing the CLA
+# is what this repository is for. That complaint is cleared as well.
 on:
+  push:
+    branches: [main]
   pull_request_target:
     types: [opened, reopened, synchronize, ready_for_review]
   status:
   workflow_dispatch:
     inputs:
       pull_request:
-        description: Pull request number to re-process
+        description: Pull request number to re-validate
         required: true
         type: string
 
@@ -22,21 +31,21 @@ permissions:
   statuses: write # override the verification/cla-signed status
 
 concurrency:
-  group: cla-${{ github.event.pull_request.number || inputs.pull_request || github.event.sha }}
+  group: validate-${{ github.event.pull_request.number || inputs.pull_request || github.sha }}
 
 jobs:
-  Self-Signup:
+  Check-Contributor-List:
     # `status` fires for every commit status, including the ones set below
     if: >-
       github.event_name != 'status' ||
       (github.event.context == 'verification/cla-signed' && github.event.state != 'success')
     runs-on: ubuntu-latest
     steps:
-      # `pull_request_target` checks out the base branch, never the pull
+      # on `pull_request_target` this checks out the base branch, never the pull
       # request's own code, which is only ever read as JSON and never executed
       - name: Check out repository code
         uses: actions/checkout@v6
-      - name: Handle CLA pull requests
+      - name: Validate
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
@@ -46,4 +55,4 @@ jobs:
           DISPATCH_PR: ${{ inputs.pull_request }}
           STATUS_SHA: ${{ github.event.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-        run: .github/scripts/handle-cla-pull-requests.sh
+        run: .github/scripts/validate.sh

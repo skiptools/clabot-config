@@ -6,12 +6,18 @@ If you accept the Skip
 [CLA](Contributor-License-Agreement.md),
 ***please [add your GitHub username to the `.clabot` file](https://github.com/skiptools/clabot-config/edit/main/.clabot)*** and create a PR in this repo.
 
-Add your username on its own line above the `ADD_NEW_GITHUB_USERNAMES_ABOVE_THIS_LINE` marker, and change nothing else. A PR that adds only its own author's username to a valid `.clabot` file is approved and merged automatically, so there is no need to wait for a Skip developer.
+A PR that does exactly that is approved and merged automatically, so there is no need to wait for a Skip developer. To qualify it has to satisfy all three of these rules:
 
-Anything else — adding someone else's username, adding more than one name, editing another part of the file, or touching another file — is left for a Skip developer to review and merge by hand.
+1. **The file stays valid, canonically formatted JSON.** It must match the output of `jq --indent 2 . .clabot` — two-space indentation, one username per line, trailing newline. Editing the file through GitHub's web editor keeps this formatting automatically.
+2. **Exactly one username is added, directly above the `ADD_NEW_GITHUB_USERNAMES_ABOVE_THIS_LINE` marker.** That marker stays the last entry in the list. No other entry may be added, removed or reordered, and no other part of the file may change.
+3. **The added username is your own** — the GitHub account that opened the PR. Nobody can sign the CLA on someone else's behalf.
 
-The CLAs are handled by cla-bot, which will check for the presence of the contributor's name in the `.clabot` file. When the PR is merged, the cla-bot can be triggered again with a `@cla-bot recheck` comment.
+If a PR edits `.clabot` and breaks any of these rules, the `Validate` check fails and says which rule was broken. Fix the PR, or ask a Skip developer to review and merge it by hand.
+
+PRs that leave `.clabot` untouched are not subject to these rules.
 
 ## The cla-bot check in this repository
 
-cla-bot is installed across the whole `skiptools` organisation and has no per-repository opt-out, so it flags every PR opened here — signing the CLA is the very thing these PRs do ([#29](https://github.com/skiptools/clabot-config/issues/29)). The [CLA workflow](.github/workflows/cla.yml) exempts this repository from that check: it overrides the `verification/cla-signed` status with a success and removes the comment cla-bot leaves behind. Contributors should not see a failing check here.
+The CLAs are handled by cla-bot, which checks for the presence of a contributor's name in the `.clabot` file. On other `skiptools` repositories a `@cla-bot recheck` comment re-triggers it after a PR here is merged.
+
+cla-bot is installed across the whole `skiptools` organisation and has no per-repository opt-out, so it also flags every PR opened *here* — even though signing the CLA is the very thing these PRs do ([#29](https://github.com/skiptools/clabot-config/issues/29)). The [`Validate` workflow](.github/workflows/validate.yml) exempts this repository from that check: it overrides the `verification/cla-signed` status with a success and removes the comment cla-bot leaves behind. Contributors should not see a CLA failure here.
