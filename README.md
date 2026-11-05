@@ -1,3 +1,6 @@
+> [!IMPORTANT]  
+> Contributing to Skip repositories no longer require signing a CLA, and so this repository is being archived and the clabot is no longer active. See https://github.com/skiptools/skipstone/pull/319 for a discussion.
+
 This is a repository for Skip contributor licence agreements (CLAs) handling.
 
 ## Add user
